@@ -4,8 +4,8 @@ const { JWT_SECRET } = require('../secrets')
 function tokenBuilder(user) {
   const payload = {
     subject: user.user_id,
+    role_name: user.role_name,
     username: user.username,
-    role_id: user.role_id,
   }
   const options = {
     expiresIn: '1d',
