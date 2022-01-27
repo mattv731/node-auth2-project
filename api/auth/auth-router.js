@@ -48,6 +48,7 @@ router.post("/register", validateRoleName, (req, res, next) => {
 router.post("/login", checkUsernameExists, (req, res, next) => {
   if (bcrypt.compareSync(req.body.password, req.user.password)) {
     const token = tokenBuilder(req.user)
+    req.decodedToken = token
     res.json({
       message: `${req.user.username} is back!`,
       token,
