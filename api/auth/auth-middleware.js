@@ -11,7 +11,7 @@ const restricted = (req, res, next) => {
       if(err) {
         next({ status: 401, message: "Token invalid" })
       } else {
-        req.decodedJwt = decoded
+        req.decodedToken = decoded
         next()
       }
     })
@@ -82,7 +82,10 @@ const validateRoleName = (req, res, next) => {
       next({ status: 422, "message": "Role name can not be admin"})
     } else if (role.trim().length > 32) {
       next({ status: 422, "message": "Role name can not be longer than 32 chars"})
-    } else {next()}
+    } else {
+      req.role_name = role.trim()
+      next()
+    }
   } catch (err) {
     req.role_name = req.body.role_name.trim()
     next(err)

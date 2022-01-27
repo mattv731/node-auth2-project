@@ -1,9 +1,24 @@
 const router = require("express").Router();
 const { checkUsernameExists, validateRoleName } = require('./auth-middleware');
 const { BCRYPT_ROUNDS } = require("../secrets"); // use this secret!l
-const makeToken = require('./auth-token-builder')
 const Users = require('./../users/users-model')
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+const { JWT_SECRET } = require('../secrets')
+
+function tokenBuilder(user) {
+  const payload = {
+    subject: user.user_id,
+    role_name: user.role_name,
+    username: user.username,
+  }
+  const options = {
+    expiresIn: '1d',
+  }
+  const token = jwt.sign(payload, JWT_SECRET, options)
+
+  return token
+}
 
 router.post("/register", validateRoleName, (req, res, next) => {
   let { username, password } = req.body
@@ -32,8 +47,7 @@ router.post("/register", validateRoleName, (req, res, next) => {
 
 router.post("/login", checkUsernameExists, (req, res, next) => {
   if (bcrypt.compareSync(req.body.password, req.user.password)) {
-    console.log('wassup')
-    const token = makeToken(req.user)
+    const token = tokenBuilder(req.user)
     res.json({
       message: `${req.user.username} is back!`,
       token,
